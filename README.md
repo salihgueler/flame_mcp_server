@@ -10,11 +10,17 @@ A Model Context Protocol (MCP) server that provides live, up-to-date documentati
 - **Search Capability**: Search through all Flame documentation via MCP tools
 - **Zero Configuration**: Works out of the box with sensible defaults
 
+## 🏗️ Architecture
+
+![Flame MCP Server Architecture](assets/diagram.png)
+
+The diagram above shows both local and hosted deployment options, with complete data flow from the Flame GitHub repository to end users.
+
 ## 📋 Prerequisites
 
 - **Dart SDK**: Version 3.2.0 or higher
 - **Internet Connection**: Required for syncing documentation from GitHub
-- **MCP Client**: Claude Desktop, MCP Inspector, or another MCP-compatible client
+- **MCP Client**: Amazon Q Developer, or another MCP-compatible client
 
 ## 🚀 Installation & Setup
 
@@ -58,7 +64,36 @@ The server will output JSON-RPC messages. Press Ctrl+C to stop.
 
 ## 🔧 Adding as MCP Service
 
-### For Claude Desktop
+### Option 1: Hosted Service (Recommended)
+
+Use the hosted version deployed on GitHub Pages - no local installation required!
+
+```json
+{
+  "mcpServers": {
+    "flame-docs": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-fetch", "https://yourusername.github.io/flame_mcp_server/"]
+    }
+  }
+}
+```
+
+**Benefits:**
+- ✅ No local setup required
+- ✅ Always up-to-date documentation
+- ✅ Automatic daily sync at 2 AM UTC
+- ✅ No resource usage on your machine
+
+### Option 2: Local Installation
+
+For local development or custom setups:
+
+### Option 2: Local Installation
+
+For local development or custom setups:
+
+#### For Claude Desktop
 
 1. **Locate your Claude Desktop config file:**
    - **macOS**: `~/Library/Application Support/Claude/claude_desktop_config.json`
@@ -82,7 +117,7 @@ The server will output JSON-RPC messages. Press Ctrl+C to stop.
 
 3. **Restart Claude Desktop** - The Flame documentation will now be available in your conversations.
 
-### For Other MCP Clients
+#### For Other MCP Clients
 
 Add to your MCP configuration file (usually `mcp.json`):
 
@@ -97,6 +132,27 @@ Add to your MCP configuration file (usually `mcp.json`):
   }
 }
 ```
+
+## 🌐 Deployment (GitHub Pages)
+
+Want to host your own version? Deploy to GitHub Pages for free:
+
+### Quick Deploy
+
+1. **Fork or clone this repository**
+2. **Push to your GitHub repository**
+3. **Enable GitHub Pages** in repository settings (Source: GitHub Actions)
+4. **Wait for deployment** (~3 minutes)
+5. **Share your URL**: `https://yourusername.github.io/flame_mcp_server/`
+
+### Automatic Features
+
+- 📅 **Daily sync at 2 AM UTC** - Always fresh documentation
+- 🔄 **Auto-deploy on push** - Updates when you make changes  
+- 🔍 **Search functionality** - Full-text search through all docs
+- 📊 **Usage statistics** - Monitor via GitHub insights
+
+See [DEPLOYMENT.md](DEPLOYMENT.md) for detailed instructions.
 
 ## ⚙️ Configuration Options
 

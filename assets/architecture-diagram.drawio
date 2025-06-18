@@ -1,0 +1,260 @@
+<mxfile host="app.diagrams.net" modified="2024-06-18T19:00:00.000Z" agent="5.0" etag="flame-mcp-architecture" version="24.5.4" type="device">
+  <diagram name="Flame MCP Server Architecture" id="flame-mcp-architecture">
+    <mxGraphModel dx="1422" dy="794" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="827" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        
+        <!-- Title -->
+        <mxCell id="title" value="Flame MCP Server Architecture" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=24;fontStyle=1;fontColor=#1f2937;" vertex="1" parent="1">
+          <mxGeometry x="400" y="20" width="369" height="40" as="geometry" />
+        </mxCell>
+        
+        <!-- Local Deployment Section -->
+        <mxCell id="local-section" value="Local Deployment" style="swimlane;whiteSpace=wrap;html=1;fontSize=16;fontStyle=1;fillColor=#dbeafe;strokeColor=#3b82f6;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="50" y="80" width="500" height="320" as="geometry" />
+        </mxCell>
+        
+        <!-- User's Machine -->
+        <mxCell id="user-machine" value="User's Machine" style="swimlane;whiteSpace=wrap;html=1;fontSize=14;fillColor=#f3f4f6;strokeColor=#6b7280;" vertex="1" parent="local-section">
+          <mxGeometry x="20" y="40" width="200" height="260" as="geometry" />
+        </mxCell>
+        
+        <!-- Claude Desktop -->
+        <mxCell id="claude-desktop" value="" style="sketch=0;outlineConnect=0;fontColor=#232F3E;gradientColor=none;fillColor=#232F3D;strokeColor=none;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;fontSize=12;fontStyle=0;aspect=fixed;pointerEvents=1;shape=mxgraph.aws4.desktop;" vertex="1" parent="user-machine">
+          <mxGeometry x="75" y="40" width="50" height="44" as="geometry" />
+        </mxCell>
+        <mxCell id="claude-label" value="Claude Desktop" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=12;" vertex="1" parent="user-machine">
+          <mxGeometry x="50" y="90" width="100" height="20" as="geometry" />
+        </mxCell>
+        
+        <!-- MCP Config -->
+        <mxCell id="mcp-config" value="" style="sketch=0;outlineConnect=0;fontColor=#232F3E;gradientColor=none;fillColor=#7AA116;strokeColor=none;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;fontSize=12;fontStyle=0;aspect=fixed;pointerEvents=1;shape=mxgraph.aws4.file;" vertex="1" parent="user-machine">
+          <mxGeometry x="75" y="130" width="50" height="61" as="geometry" />
+        </mxCell>
+        <mxCell id="config-label" value="claude_desktop_config.json" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=10;" vertex="1" parent="user-machine">
+          <mxGeometry x="30" y="195" width="140" height="20" as="geometry" />
+        </mxCell>
+        
+        <!-- Flame MCP Server -->
+        <mxCell id="flame-server" value="Flame MCP Server" style="swimlane;whiteSpace=wrap;html=1;fontSize=14;fillColor=#fef3c7;strokeColor=#f59e0b;" vertex="1" parent="local-section">
+          <mxGeometry x="250" y="40" width="230" height="260" as="geometry" />
+        </mxCell>
+        
+        <!-- Live Server -->
+        <mxCell id="live-server" value="" style="sketch=0;outlineConnect=0;fontColor=#232F3E;gradientColor=none;fillColor=#ED7100;strokeColor=none;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;fontSize=12;fontStyle=0;aspect=fixed;pointerEvents=1;shape=mxgraph.aws4.container_1;" vertex="1" parent="flame-server">
+          <mxGeometry x="30" y="40" width="48" height="31" as="geometry" />
+        </mxCell>
+        <mxCell id="live-label" value="flame_mcp_live" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=10;" vertex="1" parent="flame-server">
+          <mxGeometry x="10" y="75" width="88" height="15" as="geometry" />
+        </mxCell>
+        
+        <!-- Scheduler -->
+        <mxCell id="scheduler" value="" style="sketch=0;outlineConnect=0;fontColor=#232F3E;gradientColor=none;fillColor=#3F48CC;strokeColor=none;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;fontSize=12;fontStyle=0;aspect=fixed;pointerEvents=1;shape=mxgraph.aws4.eventbridge;" vertex="1" parent="flame-server">
+          <mxGeometry x="130" y="40" width="48" height="48" as="geometry" />
+        </mxCell>
+        <mxCell id="scheduler-label" value="Nightly Scheduler" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=10;" vertex="1" parent="flame-server">
+          <mxGeometry x="110" y="90" width="88" height="15" as="geometry" />
+        </mxCell>
+        
+        <!-- Cache -->
+        <mxCell id="cache" value="" style="sketch=0;outlineConnect=0;fontColor=#232F3E;gradientColor=none;fillColor=#3F48CC;strokeColor=none;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;fontSize=12;fontStyle=0;aspect=fixed;pointerEvents=1;shape=mxgraph.aws4.cache;" vertex="1" parent="flame-server">
+          <mxGeometry x="30" y="130" width="48" height="48" as="geometry" />
+        </mxCell>
+        <mxCell id="cache-label" value="flame_docs_cache/" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=10;" vertex="1" parent="flame-server">
+          <mxGeometry x="10" y="180" width="88" height="15" as="geometry" />
+        </mxCell>
+        
+        <!-- Sync Tool -->
+        <mxCell id="sync-tool" value="" style="sketch=0;outlineConnect=0;fontColor=#232F3E;gradientColor=none;fillColor=#7AA116;strokeColor=none;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;fontSize=12;fontStyle=0;aspect=fixed;pointerEvents=1;shape=mxgraph.aws4.command_line_interface;" vertex="1" parent="flame-server">
+          <mxGeometry x="130" y="130" width="48" height="48" as="geometry" />
+        </mxCell>
+        <mxCell id="sync-label" value="flame_sync" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=10;" vertex="1" parent="flame-server">
+          <mxGeometry x="110" y="180" width="88" height="15" as="geometry" />
+        </mxCell>
+        
+        <!-- GitHub Actions Deployment Section -->
+        <mxCell id="github-section" value="GitHub Actions Deployment" style="swimlane;whiteSpace=wrap;html=1;fontSize=16;fontStyle=1;fillColor=#dcfce7;strokeColor=#16a34a;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="600" y="80" width="520" height="320" as="geometry" />
+        </mxCell>
+        
+        <!-- GitHub Repository -->
+        <mxCell id="github-repo" value="GitHub Repository" style="swimlane;whiteSpace=wrap;html=1;fontSize=14;fillColor=#f3f4f6;strokeColor=#6b7280;" vertex="1" parent="github-section">
+          <mxGeometry x="20" y="40" width="200" height="260" as="geometry" />
+        </mxCell>
+        
+        <!-- Source Code -->
+        <mxCell id="source-code" value="" style="sketch=0;outlineConnect=0;fontColor=#232F3E;gradientColor=none;fillColor=#232F3D;strokeColor=none;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;fontSize=12;fontStyle=0;aspect=fixed;pointerEvents=1;shape=mxgraph.aws4.source_code;" vertex="1" parent="github-repo">
+          <mxGeometry x="75" y="40" width="50" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="source-label" value="Source Code" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=12;" vertex="1" parent="github-repo">
+          <mxGeometry x="50" y="95" width="100" height="20" as="geometry" />
+        </mxCell>
+        
+        <!-- GitHub Actions -->
+        <mxCell id="github-actions" value="" style="sketch=0;outlineConnect=0;fontColor=#232F3E;gradientColor=none;fillColor=#3F48CC;strokeColor=none;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;fontSize=12;fontStyle=0;aspect=fixed;pointerEvents=1;shape=mxgraph.aws4.codebuild;" vertex="1" parent="github-repo">
+          <mxGeometry x="75" y="130" width="50" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="actions-label" value="GitHub Actions" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=12;" vertex="1" parent="github-repo">
+          <mxGeometry x="50" y="185" width="100" height="20" as="geometry" />
+        </mxCell>
+        
+        <!-- GitHub Pages -->
+        <mxCell id="github-pages" value="GitHub Pages" style="swimlane;whiteSpace=wrap;html=1;fontSize=14;fillColor=#fef3c7;strokeColor=#f59e0b;" vertex="1" parent="github-section">
+          <mxGeometry x="250" y="40" width="250" height="260" as="geometry" />
+        </mxCell>
+        
+        <!-- Static API -->
+        <mxCell id="static-api" value="" style="sketch=0;outlineConnect=0;fontColor=#232F3E;gradientColor=none;fillColor=#ED7100;strokeColor=none;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;fontSize=12;fontStyle=0;aspect=fixed;pointerEvents=1;shape=mxgraph.aws4.api_gateway;" vertex="1" parent="github-pages">
+          <mxGeometry x="40" y="40" width="50" height="52" as="geometry" />
+        </mxCell>
+        <mxCell id="api-label" value="Static MCP API" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=10;" vertex="1" parent="github-pages">
+          <mxGeometry x="20" y="95" width="90" height="15" as="geometry" />
+        </mxCell>
+        
+        <!-- JSON Files -->
+        <mxCell id="json-files" value="" style="sketch=0;outlineConnect=0;fontColor=#232F3E;gradientColor=none;fillColor=#7AA116;strokeColor=none;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;fontSize=12;fontStyle=0;aspect=fixed;pointerEvents=1;shape=mxgraph.aws4.file;" vertex="1" parent="github-pages">
+          <mxGeometry x="150" y="40" width="50" height="61" as="geometry" />
+        </mxCell>
+        <mxCell id="json-label" value="JSON Resources" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=10;" vertex="1" parent="github-pages">
+          <mxGeometry x="130" y="105" width="90" height="15" as="geometry" />
+        </mxCell>
+        
+        <!-- Search Index -->
+        <mxCell id="search-index" value="" style="sketch=0;outlineConnect=0;fontColor=#232F3E;gradientColor=none;fillColor=#3F48CC;strokeColor=none;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;fontSize=12;fontStyle=0;aspect=fixed;pointerEvents=1;shape=mxgraph.aws4.elasticsearch_service;" vertex="1" parent="github-pages">
+          <mxGeometry x="40" y="140" width="50" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="search-label" value="Search Index" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=10;" vertex="1" parent="github-pages">
+          <mxGeometry x="20" y="195" width="90" height="15" as="geometry" />
+        </mxCell>
+        
+        <!-- Landing Page -->
+        <mxCell id="landing-page" value="" style="sketch=0;outlineConnect=0;fontColor=#232F3E;gradientColor=none;fillColor=#232F3D;strokeColor=none;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;fontSize=12;fontStyle=0;aspect=fixed;pointerEvents=1;shape=mxgraph.aws4.cloudfront;" vertex="1" parent="github-pages">
+          <mxGeometry x="150" y="140" width="50" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="landing-label" value="Landing Page" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=10;" vertex="1" parent="github-pages">
+          <mxGeometry x="130" y="195" width="90" height="15" as="geometry" />
+        </mxCell>
+        
+        <!-- External Services -->
+        <mxCell id="external-section" value="External Services" style="swimlane;whiteSpace=wrap;html=1;fontSize=16;fontStyle=1;fillColor=#fef2f2;strokeColor=#ef4444;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="50" y="450" width="1070" height="150" as="geometry" />
+        </mxCell>
+        
+        <!-- Flame GitHub -->
+        <mxCell id="flame-github" value="" style="sketch=0;outlineConnect=0;fontColor=#232F3E;gradientColor=none;fillColor=#232F3D;strokeColor=none;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;fontSize=12;fontStyle=0;aspect=fixed;pointerEvents=1;shape=mxgraph.aws4.source_code;" vertex="1" parent="external-section">
+          <mxGeometry x="200" y="50" width="60" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="flame-label" value="flame-engine/flame&#xa;GitHub Repository" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=12;" vertex="1" parent="external-section">
+          <mxGeometry x="150" y="115" width="160" height="25" as="geometry" />
+        </mxCell>
+        
+        <!-- GitHub API -->
+        <mxCell id="github-api" value="" style="sketch=0;outlineConnect=0;fontColor=#232F3E;gradientColor=none;fillColor=#ED7100;strokeColor=none;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;fontSize=12;fontStyle=0;aspect=fixed;pointerEvents=1;shape=mxgraph.aws4.api_gateway;" vertex="1" parent="external-section">
+          <mxGeometry x="500" y="50" width="60" height="62" as="geometry" />
+        </mxCell>
+        <mxCell id="api-github-label" value="GitHub API&#xa;(Documentation Sync)" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=12;" vertex="1" parent="external-section">
+          <mxGeometry x="450" y="115" width="160" height="25" as="geometry" />
+        </mxCell>
+        
+        <!-- MCP Clients -->
+        <mxCell id="mcp-clients" value="" style="sketch=0;outlineConnect=0;fontColor=#232F3E;gradientColor=none;fillColor=#3F48CC;strokeColor=none;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;fontSize=12;fontStyle=0;aspect=fixed;pointerEvents=1;shape=mxgraph.aws4.users;" vertex="1" parent="external-section">
+          <mxGeometry x="800" y="50" width="60" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="clients-label" value="MCP Clients&#xa;(Claude, etc.)" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=12;" vertex="1" parent="external-section">
+          <mxGeometry x="750" y="115" width="160" height="25" as="geometry" />
+        </mxCell>
+        
+        <!-- Data Flow Arrows -->
+        
+        <!-- Local: Claude to MCP Server -->
+        <mxCell id="local-flow1" value="" style="endArrow=classic;html=1;rounded=0;strokeColor=#3b82f6;strokeWidth=2;" edge="1" parent="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="250" y="180" as="sourcePoint" />
+            <mxPoint x="300" y="180" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="local-flow-label1" value="MCP Protocol" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=10;fontColor=#3b82f6;" vertex="1" parent="1">
+          <mxGeometry x="250" y="160" width="80" height="15" as="geometry" />
+        </mxCell>
+        
+        <!-- Local: Server to GitHub -->
+        <mxCell id="local-flow2" value="" style="endArrow=classic;html=1;rounded=0;strokeColor=#16a34a;strokeWidth=2;" edge="1" parent="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="380" y="400" as="sourcePoint" />
+            <mxPoint x="380" y="450" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="local-flow-label2" value="Sync Docs" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=10;fontColor=#16a34a;" vertex="1" parent="1">
+          <mxGeometry x="390" y="420" width="60" height="15" as="geometry" />
+        </mxCell>
+        
+        <!-- GitHub Actions: Repo to Actions -->
+        <mxCell id="github-flow1" value="" style="endArrow=classic;html=1;rounded=0;strokeColor=#f59e0b;strokeWidth=2;" edge="1" parent="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="820" y="180" as="sourcePoint" />
+            <mxPoint x="870" y="180" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="github-flow-label1" value="Deploy" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=10;fontColor=#f59e0b;" vertex="1" parent="1">
+          <mxGeometry x="830" y="160" width="40" height="15" as="geometry" />
+        </mxCell>
+        
+        <!-- GitHub Actions: Actions to GitHub API -->
+        <mxCell id="github-flow2" value="" style="endArrow=classic;html=1;rounded=0;strokeColor=#16a34a;strokeWidth=2;" edge="1" parent="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="720" y="400" as="sourcePoint" />
+            <mxPoint x="580" y="450" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="github-flow-label2" value="Fetch Docs" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=10;fontColor=#16a34a;" vertex="1" parent="1">
+          <mxGeometry x="620" y="420" width="60" height="15" as="geometry" />
+        </mxCell>
+        
+        <!-- Users to GitHub Pages -->
+        <mxCell id="user-flow" value="" style="endArrow=classic;html=1;rounded=0;strokeColor=#8b5cf6;strokeWidth=2;" edge="1" parent="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="880" y="450" as="sourcePoint" />
+            <mxPoint x="980" y="400" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="user-flow-label" value="HTTPS API" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=10;fontColor=#8b5cf6;" vertex="1" parent="1">
+          <mxGeometry x="920" y="420" width="60" height="15" as="geometry" />
+        </mxCell>
+        
+        <!-- Legend -->
+        <mxCell id="legend" value="Legend" style="swimlane;whiteSpace=wrap;html=1;fontSize=14;fontStyle=1;fillColor=#f9fafb;strokeColor=#d1d5db;" vertex="1" parent="1">
+          <mxGeometry x="50" y="650" width="1070" height="120" as="geometry" />
+        </mxCell>
+        
+        <!-- Legend Items -->
+        <mxCell id="legend-local" value="Local Deployment" style="text;html=1;strokeColor=#3b82f6;fillColor=#dbeafe;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=1;fontSize=12;fontStyle=1;" vertex="1" parent="legend">
+          <mxGeometry x="50" y="40" width="120" height="30" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="legend-github" value="GitHub Actions" style="text;html=1;strokeColor=#16a34a;fillColor=#dcfce7;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=1;fontSize=12;fontStyle=1;" vertex="1" parent="legend">
+          <mxGeometry x="200" y="40" width="120" height="30" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="legend-external" value="External Services" style="text;html=1;strokeColor=#ef4444;fillColor=#fef2f2;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=1;fontSize=12;fontStyle=1;" vertex="1" parent="legend">
+          <mxGeometry x="350" y="40" width="120" height="30" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="legend-flow" value="Data Flow" style="text;html=1;strokeColor=#8b5cf6;fillColor=#f3e8ff;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=1;fontSize=12;fontStyle=1;" vertex="1" parent="legend">
+          <mxGeometry x="500" y="40" width="120" height="30" as="geometry" />
+        </mxCell>
+        
+        <!-- Features Box -->
+        <mxCell id="features" value="✅ Live Documentation Sync&#xa;✅ Smart 24h Caching&#xa;✅ Nightly Scheduler (2 AM UTC)&#xa;✅ Search Functionality&#xa;✅ Zero Configuration&#xa;✅ GitHub Pages Hosting" style="text;html=1;strokeColor=#059669;fillColor=#ecfdf5;align=left;verticalAlign=top;whiteSpace=wrap;rounded=1;fontSize=11;fontStyle=0;" vertex="1" parent="legend">
+          <mxGeometry x="650" y="30" width="200" height="80" as="geometry" />
+        </mxCell>
+        
+        <!-- Stats Box -->
+        <mxCell id="stats" value="📊 Statistics&#xa;• 84+ Documentation Files&#xa;• Sub-second Startup&#xa;• &lt;50MB Memory Usage&#xa;• 2-3MB Cache Size&#xa;• Daily Auto-Updates" style="text;html=1;strokeColor=#dc2626;fillColor=#fef2f2;align=left;verticalAlign=top;whiteSpace=wrap;rounded=1;fontSize=11;fontStyle=0;" vertex="1" parent="legend">
+          <mxGeometry x="870" y="30" width="180" height="80" as="geometry" />
+        </mxCell>
+        
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
