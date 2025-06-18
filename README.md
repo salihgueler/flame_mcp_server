@@ -1,175 +1,284 @@
 # Flame MCP Server
 
-A clean, robust Model Context Protocol (MCP) server providing live documentation for the Flame game engine in Flutter/Dart.
+A Model Context Protocol (MCP) server that provides live, up-to-date documentation for the Flame game engine. This server automatically syncs documentation from the official Flame GitHub repository and serves it through the MCP protocol for use with AI assistants like Claude.
 
-## ✨ Features
+## 🎯 What This Does
 
-- **Live Documentation**: Fetches latest docs directly from GitHub
-- **Smart Caching**: Only syncs if cache is older than 24 hours  
-- **Nightly Scheduler**: Optional automatic sync at 2 AM
-- **Search**: Search through all documentation
-- **Manual Sync**: Force sync when needed
-- **Fallback**: Graceful handling of network issues
+- **Fetches Live Documentation**: Automatically downloads the latest Flame engine documentation from GitHub
+- **Smart Caching**: Only re-syncs when documentation is older than 24 hours
+- **Nightly Updates**: Optional automatic sync at 2 AM to keep docs fresh
+- **Search Capability**: Search through all Flame documentation via MCP tools
+- **Zero Configuration**: Works out of the box with sensible defaults
 
-## 🚀 Quick Start
+## 📋 Prerequisites
 
-### 1. Build
+- **Dart SDK**: Version 3.2.0 or higher
+- **Internet Connection**: Required for syncing documentation from GitHub
+- **MCP Client**: Claude Desktop, MCP Inspector, or another MCP-compatible client
+
+## 🚀 Installation & Setup
+
+### Step 1: Clone and Build
+
 ```bash
+# Clone or download this repository
+cd /path/to/flame_mcp_server
+
+# Install dependencies and build executables
 ./build_clean.sh
 ```
 
-### 2. Start Live Server
+This will create two executables in the `build/` directory:
+- `flame_mcp_live` - The main MCP server with live documentation
+- `flame_sync` - Utility for manual documentation sync
+
+### Step 2: Test the Installation
+
 ```bash
-# Basic live server (auto-sync if cache is old)
+# Test manual sync (downloads ~84 documentation files)
+./build/flame_sync
+
+# Check that documentation was downloaded
+ls flame_docs_cache/
+```
+
+You should see directories like `components/`, `rendering/`, `bridge_packages/`, etc.
+
+### Step 3: Test the MCP Server
+
+```bash
+# Start the server (will auto-sync if cache is old)
 ./build/flame_mcp_live
 
-# With nightly scheduler at 2 AM
+# Or start with nightly scheduler enabled
 ./build/flame_mcp_live --scheduler
 ```
 
-### 3. Manual Sync
-```bash
-./build/flame_sync
-```
+The server will output JSON-RPC messages. Press Ctrl+C to stop.
 
-## 📋 Available Tools
+## 🔧 Adding as MCP Service
 
-When using the live server, you get these MCP tools:
+### For Claude Desktop
 
-- **search_documentation**: Search through all Flame docs
-- **sync_documentation**: Manually trigger a sync
-- **scheduler_status**: Check scheduler status (if enabled)
+1. **Locate your Claude Desktop config file:**
+   - **macOS**: `~/Library/Application Support/Claude/claude_desktop_config.json`
+   - **Windows**: `%APPDATA%\Claude\claude_desktop_config.json`
+   - **Linux**: `~/.config/Claude/claude_desktop_config.json`
 
-## 🔧 How It Works
-
-### Smart Caching
-- Checks if cached docs are less than 24 hours old
-- If cache is stale or missing, syncs automatically
-- Stores 80+ documentation files locally
-
-### Nightly Scheduler  
-- Runs at 2 AM daily (when enabled with `--scheduler`)
-- Handles failures gracefully
-- Provides status via MCP tools
-
-### GitHub Integration
-- Fetches from `flame-engine/flame` repository
-- Downloads all `.md` files from `/doc` directory
-- Preserves directory structure
-- Creates metadata with sync timestamps
-
-## 📁 File Structure
-
-```
-flame_docs_cache/           # Cached documentation
-├── metadata.json          # Sync information
-├── getting_started.md     # Core docs
-├── components/            # Component docs
-├── rendering/             # Rendering docs
-└── ...                    # All other docs
-```
-
-## 🛠️ Configuration
-
-### Environment Variables
-- `GITHUB_TOKEN`: Optional, for higher API rate limits
-
-### Cache Location
-- Default: `./flame_docs_cache`
-- Automatically created and managed
-
-## 📊 MCP Resources
-
-The server provides these resources:
-
-- `flame://getting_started` - Getting started guide
-- `flame://components/component_system` - Component system docs
-- `flame://rendering/rendering` - Rendering documentation
-- `flame://metadata` - Sync metadata (JSON)
-- `flame://scheduler/status` - Scheduler status (if enabled)
-
-## 🔍 Example Usage
-
-### With Claude Desktop
-Add to your `claude_desktop_config.json`:
+2. **Add the Flame MCP server to your config:**
 
 ```json
 {
   "mcpServers": {
-    "flame-live": {
-      "command": "/path/to/build/flame_mcp_live",
+    "flame-docs": {
+      "command": "/Users/msalihg/Desktop/flame_mcp_server/build/flame_mcp_live",
       "args": ["--scheduler"]
     }
   }
 }
 ```
 
-### Manual Testing
-```bash
-# Sync documentation
-./build/flame_sync
+**Important**: Replace `/Users/msalihg/Desktop/flame_mcp_server` with your actual path to this project.
 
-# Start server with scheduler
-./build/flame_mcp_live --scheduler
+3. **Restart Claude Desktop** - The Flame documentation will now be available in your conversations.
 
-# Check what was synced
-find flame_docs_cache -name "*.md" | wc -l
+### For Other MCP Clients
+
+Add to your MCP configuration file (usually `mcp.json`):
+
+```json
+{
+  "servers": {
+    "flame-docs": {
+      "command": "/path/to/flame_mcp_server/build/flame_mcp_live",
+      "args": ["--scheduler"],
+      "description": "Live Flame game engine documentation"
+    }
+  }
+}
 ```
 
-## 🎯 Benefits
+## ⚙️ Configuration Options
 
-1. **Simple**: Just 3 core files, easy to understand
-2. **Robust**: Handles failures gracefully
-3. **Efficient**: Smart caching, only syncs when needed
-4. **Flexible**: Works with or without scheduler
-5. **Clean**: No complex dependencies or configurations
+### Server Modes
 
-## 🔄 Sync Process
+| Command | Description |
+|---------|-------------|
+| `./build/flame_mcp_live` | Basic mode - syncs only when cache is >24h old |
+| `./build/flame_mcp_live --scheduler` | **Recommended** - includes nightly sync at 2 AM |
 
-1. **Check Cache**: Is it less than 24 hours old?
-2. **Fetch Structure**: Get directory tree from GitHub API
-3. **Download Files**: Fetch all `.md` files
-4. **Create Metadata**: Store sync timestamp and info
-5. **Serve Content**: Provide via MCP protocol
+### Environment Variables
 
-## 📈 Statistics
+| Variable | Description | Default |
+|----------|-------------|---------|
+| `GITHUB_TOKEN` | GitHub personal access token for higher API rate limits | None |
 
-- **84 documentation files** synced from GitHub
-- **Sub-second startup** with valid cache
-- **2 AM daily sync** (optional)
-- **3 MCP tools** for interaction
-- **Zero configuration** required
+**Setting up GitHub Token (Optional but Recommended):**
 
-## 📂 Project Structure
+1. Go to GitHub Settings → Developer settings → Personal access tokens
+2. Generate a token with `public_repo` access
+3. Set the environment variable:
+   ```bash
+   export GITHUB_TOKEN=your_token_here
+   ```
+
+This increases your GitHub API rate limit from 60 to 5000 requests per hour.
+
+## 🛠️ Available MCP Tools
+
+Once connected, you'll have access to these tools in your MCP client:
+
+### 1. `search_documentation`
+Search through all Flame documentation.
+
+**Parameters:**
+- `query` (required): What to search for
+- `section` (optional): Limit search to specific section
+
+**Example usage in Claude:**
+> "Search the Flame documentation for collision detection examples"
+
+### 2. `sync_documentation`
+Manually trigger a documentation sync from GitHub.
+
+**Example usage in Claude:**
+> "Sync the Flame documentation to get the latest updates"
+
+### 3. `scheduler_status` (if using `--scheduler`)
+Check the status of the nightly sync scheduler.
+
+**Example usage in Claude:**
+> "What's the status of the Flame documentation scheduler?"
+
+## 📊 MCP Resources
+
+The server provides access to 80+ documentation resources, including:
+
+- `flame://getting_started` - Getting started guide
+- `flame://components/component_system` - Component system documentation
+- `flame://rendering/rendering` - Rendering and graphics
+- `flame://inputs/inputs` - Input handling
+- `flame://collision_detection/collision_detection` - Collision systems
+- `flame://effects/effects` - Effects and animations
+- And many more...
+
+## 🔍 How It Works
+
+### Documentation Sync Process
+
+1. **GitHub API**: Fetches the directory structure from `flame-engine/flame/doc`
+2. **Download**: Downloads all `.md` files while preserving directory structure
+3. **Cache**: Stores files locally in `flame_docs_cache/`
+4. **Metadata**: Creates sync metadata with timestamps
+5. **Serve**: Makes documentation available via MCP protocol
+
+### Smart Caching
+
+- Checks if cached docs are less than 24 hours old
+- Only syncs if cache is stale or missing
+- Handles network failures gracefully
+- Falls back to existing cache if sync fails
+
+### Nightly Scheduler (Optional)
+
+- Runs at 2:00 AM local time when enabled with `--scheduler`
+- Automatically retries on failure
+- Provides status information via MCP tools
+- Logs sync results for debugging
+
+## 📁 Project Structure
 
 ```
 flame_mcp_server/
 ├── bin/
-│   ├── flame_mcp_live.dart       # Live MCP server
-│   └── flame_sync.dart           # Manual sync utility
+│   ├── flame_mcp_live.dart    # Main MCP server
+│   └── flame_sync.dart        # Manual sync utility
 ├── lib/src/
-│   ├── flame_live_docs.dart      # GitHub doc fetcher
-│   ├── simple_scheduler.dart     # Nightly scheduler
-│   └── flame_mcp_live.dart       # Live MCP server implementation
-├── build_clean.sh                # Build script
-└── README.md                     # This file
+│   ├── flame_live_docs.dart   # GitHub documentation fetcher
+│   ├── simple_scheduler.dart  # Nightly sync scheduler
+│   └── flame_mcp_live.dart    # MCP server implementation
+├── build_clean.sh             # Build script
+├── .gitignore                 # Git ignore rules
+├── LICENSE                    # MIT License
+└── README.md                  # This file
+
+# Generated at runtime (ignored by git):
+├── flame_docs_cache/          # Downloaded documentation
+├── build/                     # Compiled executables
+└── .dart_tool/               # Dart build artifacts
 ```
+
+## 🐛 Troubleshooting
+
+### Build Issues
+
+**Problem**: `dart pub get` fails
+**Solution**: Ensure you have Dart SDK 3.2.0+ installed
+
+**Problem**: Permission denied when running executables
+**Solution**: 
+```bash
+chmod +x build/flame_mcp_live build/flame_sync
+```
+
+### Sync Issues
+
+**Problem**: GitHub rate limit exceeded
+**Solution**: Set up a `GITHUB_TOKEN` environment variable
+
+**Problem**: Network timeout during sync
+**Solution**: The server will retry automatically, or run `./build/flame_sync` manually
+
+### MCP Integration Issues
+
+**Problem**: Claude Desktop doesn't see the server
+**Solution**: 
+1. Check that the path in your config is absolute and correct
+2. Restart Claude Desktop after config changes
+3. Verify the executable exists and is runnable
+
+**Problem**: Server starts but no documentation appears
+**Solution**: 
+1. Run `./build/flame_sync` to manually sync documentation
+2. Check that `flame_docs_cache/` directory contains `.md` files
+
+## 📈 Performance & Statistics
+
+- **Documentation Files**: ~84 Markdown files
+- **Sync Time**: 30-60 seconds (depending on network)
+- **Cache Size**: ~2-3 MB
+- **Memory Usage**: <50 MB when running
+- **Startup Time**: <1 second with valid cache
 
 ## 🤝 Contributing
 
 1. Fork the repository
-2. Create a feature branch
-3. Add your improvements
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Make your changes
 4. Test thoroughly
-5. Submit a pull request
+5. Commit your changes (`git commit -m 'Add amazing feature'`)
+6. Push to the branch (`git push origin feature/amazing-feature`)
+7. Open a Pull Request
 
 ## 📄 License
 
-This project is licensed under the MIT License.
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-## 🔗 Resources
+## 🔗 Related Links
 
 - [Flame Engine Documentation](https://docs.flame-engine.org/)
-- [Model Context Protocol](https://modelcontextprotocol.io/)
-- [Flutter Documentation](https://flutter.dev/docs)
+- [Model Context Protocol Specification](https://modelcontextprotocol.io/)
+- [Claude Desktop](https://claude.ai/desktop)
 - [Dart Language](https://dart.dev/)
+
+## 💡 Tips for Best Experience
+
+1. **Use the scheduler**: Add `--scheduler` for automatic nightly updates
+2. **Set GitHub token**: Avoid rate limiting with a personal access token  
+3. **Regular syncing**: Run `./build/flame_sync` after major Flame releases
+4. **Search effectively**: Use specific terms when searching documentation
+5. **Check status**: Use the `scheduler_status` tool to monitor sync health
+
+---
+
+**Ready to get started?** Run `./build_clean.sh` and add the server to your MCP client configuration!
