@@ -1,0 +1,37 @@
+# Dart/Flutter
+.dart_tool/
+.packages
+build/
+pubspec.lock
+
+# IDE
+.vscode/
+.idea/
+*.iml
+*.ipr
+*.iws
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Documentation cache (generated at runtime)
+flame_docs_cache/
+
+# Logs
+*.log
+sync_logs/
+
+# Scheduler config (generated at runtime)
+scheduler_config.json
+
+# Compiled executables
+*.exe
+simple_flame_mcp_server
+
+# Example directory (if not needed)
+example/
+
+# Temporary files
+*.tmp
+*.temp
