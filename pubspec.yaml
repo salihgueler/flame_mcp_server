@@ -1,5 +1,5 @@
 name: flame_mcp_server
-description: MCP server providing comprehensive Flame engine documentation and resources
+description: Local MCP server providing on-demand Flame engine documentation from GitHub
 version: 1.0.0
 
 environment:

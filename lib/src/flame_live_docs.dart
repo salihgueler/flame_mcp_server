@@ -5,173 +5,192 @@ import 'package:path/path.dart' as path;
 
 /// Simple, robust live documentation fetcher for Flame engine
 class FlameLiveDocs {
-  static const String repoApiUrl = 'https://api.github.com/repos/flame-engine/flame/contents/doc';
-  static const String rawBaseUrl = 'https://raw.githubusercontent.com/flame-engine/flame/main/doc';
-  static const String cacheDir = './flame_docs_cache';
+  static const String repoApiUrl =
+      'https://api.github.com/repos/flame-engine/flame/contents/doc';
+  static const String rawBaseUrl =
+      'https://raw.githubusercontent.com/flame-engine/flame/main/doc';
   
-  final http.Client _client = http.Client();
-  
-  /// Sync documentation from GitHub
-  Future<void> syncDocs() async {
-    print('🔄 Syncing Flame documentation from GitHub...');
+  // Use absolute path for cache directory
+  static String get cacheDir {
+    // Get the directory where the executable is located
+    final executablePath = Platform.resolvedExecutable;
+    final executableDir = File(executablePath).parent.path;
     
-    try {
-      // Create cache directory
-      final dir = Directory(cacheDir);
-      if (await dir.exists()) {
-        await dir.delete(recursive: true);
-      }
-      await dir.create(recursive: true);
-      
-      // Fetch all markdown files
-      await _fetchDirectory('');
-      
-      // Create metadata
-      await _createMetadata();
-      
-      print('✅ Documentation sync completed!');
-    } catch (e) {
-      print('❌ Sync failed: $e');
-      rethrow;
+    // The executable is in build/, so go up one level to project root
+    final projectRoot = Directory(executableDir).parent.path;
+    return path.join(projectRoot, 'flame_docs_cache');
+  }
+
+  final http.Client _client = http.Client();
+  final String? _githubToken;
+
+  /// Create a new FlameLiveDocs instance
+  ///
+  /// [githubToken] - Optional GitHub personal access token for higher rate limits
+  /// If not provided, will check GITHUB_TOKEN environment variable
+  FlameLiveDocs({String? githubToken})
+      : _githubToken = githubToken ?? Platform.environment['GITHUB_TOKEN'];
+
+  /// Initialize the documentation system
+  Future<void> initialize() async {
+    // Check if cache exists and build index
+    final dir = Directory(cacheDir);
+    if (await dir.exists()) {
+      await _buildIndex();
     }
   }
-  
-  /// Get all available documentation resources
-  Future<List<String>> getResources() async {
+
+  /// Get HTTP headers for GitHub API requests
+  Map<String, String> _getHeaders() {
+    final headers = <String, String>{
+      'Accept': 'application/vnd.github.v3+json',
+      'User-Agent': 'Flame-MCP-Server/1.0',
+    };
+
+    if (_githubToken != null && _githubToken.isNotEmpty) {
+      headers['Authorization'] = 'Bearer $_githubToken';
+    }
+
+    return headers;
+  }
+
+  /// Check GitHub API rate limit status
+  Future<Map<String, dynamic>> getRateLimitStatus() async {
+    try {
+      final response = await _client.get(
+        Uri.parse('https://api.github.com/rate_limit'),
+        headers: _getHeaders(),
+      );
+
+      if (response.statusCode == 200) {
+        return jsonDecode(response.body);
+      } else {
+        throw Exception('Failed to get rate limit: ${response.statusCode}');
+      }
+    } catch (e) {
+      return {'error': e.toString()};
+    }
+  }
+
+  // Cache for indexed resources
+  List<String>? _cachedResources;
+
+  /// Build index of all cached files
+  Future<void> _buildIndex() async {
     final resources = <String>[];
     final dir = Directory(cacheDir);
-    
-    if (!await dir.exists()) {
-      return resources;
-    }
-    
-    await for (final entity in dir.list(recursive: true)) {
-      if (entity is File && entity.path.endsWith('.md')) {
-        final relativePath = path.relative(entity.path, from: cacheDir);
-        final uri = 'flame://${relativePath.replaceAll(path.separator, '/').replaceAll('.md', '')}';
-        resources.add(uri);
+
+    if (await dir.exists()) {
+      await for (final entity in dir.list(recursive: true)) {
+        if (entity is File && entity.path.endsWith('.md')) {
+          final relativePath = path.relative(entity.path, from: cacheDir);
+          final uri = 'flame://${relativePath.replaceAll(path.separator, '/').replaceAll('.md', '')}';
+          resources.add(uri);
+        }
       }
     }
     
-    return resources;
+    _cachedResources = resources;
   }
-  
+
+  /// Get all available documentation resources
+  Future<List<String>> getResources() async {
+    // Return cached resources if available
+    if (_cachedResources != null) {
+      return _cachedResources!;
+    }
+    
+    // Build index if not cached
+    await _buildIndex();
+    return _cachedResources ?? [];
+  }
+
   /// Get content for a specific resource
   Future<String?> getContent(String uri) async {
     final docPath = uri.replaceFirst('flame://', '');
     final filePath = path.join(cacheDir, '$docPath.md');
     final file = File(filePath);
-    
-    if (await file.exists()) {
-      return await file.readAsString();
-    }
-    
-    return null;
-  }
-  
-  /// Get sync metadata
-  Future<Map<String, dynamic>?> getMetadata() async {
-    final file = File(path.join(cacheDir, 'metadata.json'));
+
     if (await file.exists()) {
       final content = await file.readAsString();
-      return jsonDecode(content);
+      return _sanitizeContent(content);
     }
+
     return null;
   }
-  
-  /// Check if docs are cached and recent (less than 24 hours old)
-  Future<bool> isCacheValid() async {
-    final metadata = await getMetadata();
-    if (metadata == null) return false;
-    
-    final lastSync = DateTime.tryParse(metadata['lastSync'] ?? '');
-    if (lastSync == null) return false;
-    
-    final age = DateTime.now().difference(lastSync);
-    return age.inHours < 24;
+
+  /// Sanitize content to avoid JSON encoding issues
+  String _sanitizeContent(String content) {
+    // Remove or replace characters that might cause JSON parsing issues
+    return content
+        // Replace text emoticons that might cause issues
+        .replaceAll(':)', '🙂')
+        .replaceAll(':(', '🙁')
+        .replaceAll(':D', '😀')
+        .replaceAll(';)', '😉')
+        // Remove control characters except newlines and tabs
+        .replaceAll(RegExp(r'[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]'), '')
+        // Ensure content is valid UTF-8
+        .replaceAll('\uFFFD', '?'); // Replace replacement character
   }
-  
+
   /// Search through documentation
   Future<List<Map<String, dynamic>>> search(String query) async {
     final results = <Map<String, dynamic>>[];
     final resources = await getResources();
-    
+
     for (final uri in resources) {
-      final content = await getContent(uri);
-      if (content != null && content.toLowerCase().contains(query.toLowerCase())) {
-        final title = uri.replaceFirst('flame://', '').replaceAll('/', ' > ');
-        final snippet = _extractSnippet(content, query);
-        
-        results.add({
-          'uri': uri,
-          'title': title,
-          'snippet': snippet,
-        });
+      try {
+        final content = await getContent(uri);
+        if (content != null &&
+            content.toLowerCase().contains(query.toLowerCase())) {
+          final title = uri.replaceFirst('flame://', '').replaceAll('/', ' > ');
+          final snippet = _extractSnippet(content, query);
+
+          results.add({
+            'uri': uri,
+            'title': title,
+            'snippet': snippet,
+          });
+        }
+      } catch (e) {
+        // Skip files that can't be read
       }
     }
-    
+
     return results;
   }
-  
-  Future<void> _fetchDirectory(String relativePath) async {
-    final apiUrl = relativePath.isEmpty ? repoApiUrl : '$repoApiUrl/$relativePath';
+
+  /// Search specifically through tutorial documentation
+  Future<List<Map<String, dynamic>>> searchTutorials(String query) async {
+    final results = <Map<String, dynamic>>[];
+    final resources = await getResources();
     
-    try {
-      final response = await _client.get(Uri.parse(apiUrl));
-      if (response.statusCode != 200) {
-        throw Exception('Failed to fetch directory: ${response.statusCode}');
-      }
-      
-      final List<dynamic> items = jsonDecode(response.body);
-      
-      for (final item in items) {
-        final name = item['name'] as String;
-        final type = item['type'] as String;
-        final itemPath = relativePath.isEmpty ? name : '$relativePath/$name';
-        
-        if (type == 'dir') {
-          // Create local directory and recurse
-          final localDir = Directory(path.join(cacheDir, itemPath));
-          await localDir.create(recursive: true);
-          await _fetchDirectory(itemPath);
-        } else if (type == 'file' && name.endsWith('.md')) {
-          // Download markdown file
-          await _downloadFile(itemPath);
+    // Filter to only tutorial resources
+    final tutorialResources = resources.where((uri) => uri.contains('tutorials/')).toList();
+
+    for (final uri in tutorialResources) {
+      try {
+        final content = await getContent(uri);
+        if (content != null &&
+            content.toLowerCase().contains(query.toLowerCase())) {
+          final title = uri.replaceFirst('flame://', '').replaceAll('/', ' > ');
+          final snippet = _extractSnippet(content, query);
+
+          results.add({
+            'uri': uri,
+            'title': title,
+            'snippet': snippet,
+          });
         }
+      } catch (e) {
+        // Skip files that can't be read
       }
-    } catch (e) {
-      print('⚠️  Error fetching directory $relativePath: $e');
     }
+
+    return results;
   }
-  
-  Future<void> _downloadFile(String remotePath) async {
-    final rawUrl = '$rawBaseUrl/$remotePath';
-    final localPath = path.join(cacheDir, remotePath);
-    
-    try {
-      final response = await _client.get(Uri.parse(rawUrl));
-      if (response.statusCode == 200) {
-        await File(localPath).writeAsString(response.body);
-        print('📄 Downloaded: $remotePath');
-      } else {
-        print('⚠️  Failed to download $remotePath: ${response.statusCode}');
-      }
-    } catch (e) {
-      print('⚠️  Error downloading $remotePath: $e');
-    }
-  }
-  
-  Future<void> _createMetadata() async {
-    final metadata = {
-      'lastSync': DateTime.now().toIso8601String(),
-      'source': 'https://github.com/flame-engine/flame',
-      'version': 'main',
-    };
-    
-    final file = File(path.join(cacheDir, 'metadata.json'));
-    await file.writeAsString(jsonEncode(metadata));
-  }
-  
+
   String _extractSnippet(String content, String query) {
     final lines = content.split('\n');
     for (int i = 0; i < lines.length; i++) {
@@ -183,7 +202,7 @@ class FlameLiveDocs {
     }
     return lines.take(3).join('\n').trim();
   }
-  
+
   void dispose() {
     _client.close();
   }
