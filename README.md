@@ -4,9 +4,7 @@ A Model Context Protocol (MCP) server that provides comprehensive access to Flam
 
 ## 🎯 What This Does
 
-```markdown
 ![Architecture Diagram](assets/diagram.png)
-```
 
 - **Documentation Access**: Provides searchable access to the complete Flame engine documentation
 - **Tutorial System**: Offers step-by-step game development tutorials (Space Shooter, Platformer, Klondike)
