@@ -1,55 +1,39 @@
 # Flame MCP Server
 
-A Model Context Protocol (MCP) server that provides on-demand documentation for the Flame game engine. This server fetches documentation from the official Flame GitHub repository and makes it available to AI assistants like Claude Desktop and Amazon Q Developer through the MCP protocol.
+A Model Context Protocol (MCP) server that provides comprehensive access to Flame game engine documentation for AI assistants like Claude Desktop and Amazon Q Developer.
 
 ## 🎯 What This Does
 
-- **On-Demand Documentation**: Fetches Flame engine documentation from GitHub when requested
-- **Local Caching**: Stores documentation locally in `flame_docs_cache/` to avoid repeated API calls
-- **MCP Integration**: Provides documentation as MCP resources and search tools
-- **Search Capability**: Search through all cached Flame documentation
-- **Manual Sync**: Refresh documentation cache when needed
+```markdown
+![Architecture Diagram](assets/diagram.png)
+```
 
-## 📋 Prerequisites
-
-- **Dart SDK**: Version 3.2.0 or higher
-- **Internet Connection**: Required for fetching documentation from GitHub
-- **MCP Client**: Amazon Q Developer, Claude Desktop, or another MCP-compatible client
+- **Documentation Access**: Provides searchable access to the complete Flame engine documentation
+- **Tutorial System**: Offers step-by-step game development tutorials (Space Shooter, Platformer, Klondike)
+- **Local Caching**: Stores documentation locally for fast, offline access
+- **MCP Integration**: Works seamlessly with Claude Desktop and Amazon Q CLI
+- **Search Tools**: Intelligent search across all documentation and tutorials
 
 ## 🚀 Quick Start
 
-### 1. Clone and Build
+### 1. Build and Setup
 
 ```bash
-# Clone this repository
+# Clone and build the server
 git clone <repository-url>
 cd flame_mcp_server
-
-# Build executables and sync documentation
 ./build_clean.sh
 ```
 
-This creates two executables in the `build/` directory:
-- `flame_mcp_live` - The MCP server
-- `flame_sync` - Manual documentation sync utility
+This will:
+- Install Dart dependencies
+- Build the MCP server executable
+- Download and cache all Flame documentation (~146 files)
 
-### 2. Test the Installation
+### 2. Configure Your MCP Client
 
-```bash
-# Verify documentation was downloaded
-ls flame_docs_cache/
-# Should show: bridge_packages/ flame/ tutorials/ development/ etc.
-
-# Test the MCP server (press Ctrl+C to stop)
-./build/flame_mcp_live
-```
-
-## 🔧 MCP Client Configuration
-
-### Amazon Q Developer
-
+#### Amazon Q Developer
 Add to your MCP configuration:
-
 ```json
 {
   "mcpServers": {
@@ -60,15 +44,8 @@ Add to your MCP configuration:
 }
 ```
 
-### Claude Desktop
-
-1. **Locate your config file:**
-   - **macOS**: `~/Library/Application Support/Claude/claude_desktop_config.json`
-   - **Windows**: `%APPDATA%\\Claude\\claude_desktop_config.json`
-   - **Linux**: `~/.config/Claude/claude_desktop_config.json`
-
-2. **Add the server:**
-
+#### Claude Desktop
+Add to `claude_desktop_config.json`:
 ```json
 {
   "mcpServers": {
@@ -79,172 +56,168 @@ Add to your MCP configuration:
 }
 ```
 
-3. **Restart your MCP client** to load the Flame documentation.
+**Config file locations:**
+- **macOS**: `~/Library/Application Support/Claude/claude_desktop_config.json`
+- **Windows**: `%APPDATA%\\Claude\\claude_desktop_config.json`
+- **Linux**: `~/.config/Claude/claude_desktop_config.json`
 
-**Important**: Use the absolute path to your `flame_mcp_live` executable.
+### 3. Restart Your MCP Client
 
-## ⚙️ Configuration
+Restart Claude Desktop or Amazon Q CLI to load the Flame documentation server.
+
+## 🛠️ Available Tools
+
+### `search_documentation`
+Search through all Flame documentation for specific topics.
+
+**Example queries:**
+- *"How do I implement collision detection in Flame?"*
+- *"Search for component system examples"*
+- *"Find information about sprite animations"*
+
+### `tutorial`
+Get complete step-by-step game development tutorials.
+
+**Available tutorials:**
+- **Space Shooter**: Complete 6-step tutorial for building a classic space shooter
+- **Platformer**: 7-step tutorial for building a side-scrolling platformer (Ember Quest)
+- **Klondike**: 5-step tutorial for building a solitaire card game
+
+**Example usage:**
+- *"Show me how to build a space shooter game"* → Complete tutorial with all steps
+- *"I want to create a platformer game"* → Full platformer tutorial
+- *"List all available tutorials"* → Overview of all tutorials
+
+## 📊 Architecture
+
+```
+┌─────────────────┐    ┌──────────────────┐    ┌─────────────────┐
+│   MCP Client    │    │  Flame MCP       │    │  Documentation  │
+│ (Claude/Amazon Q)│◄──►│     Server       │◄──►│     Cache       │
+└─────────────────┘    └──────────────────┘    └─────────────────┘
+                              │
+                              ▼
+                       ┌──────────────────┐
+                       │   GitHub API     │
+                       │ (flame-engine/   │
+                       │    flame/doc)    │
+                       └──────────────────┘
+```
+
+## 🔧 Configuration
 
 ### GitHub Token (Recommended)
 
-Without a GitHub token, you're limited to 60 API requests per hour. With a token, you get 5,000 requests per hour.
+For better rate limits (5,000 vs 60 requests/hour):
 
 1. **Create a GitHub Personal Access Token:**
-   - Go to [GitHub Settings → Developer settings → Personal access tokens → Tokens (classic)](https://github.com/settings/tokens)
-   - Click "Generate new token (classic)"
-   - Name: "Flame MCP Server"
-   - Scopes: Select **`public_repo`** (for accessing public repositories)
-   - Generate and copy the token
+   - Go to [GitHub Settings → Developer settings → Personal access tokens](https://github.com/settings/tokens)
+   - Generate new token with `public_repo` scope
 
-2. **Set the environment variable:**
-
-   **macOS/Linux:**
+2. **Set environment variable:**
    ```bash
+   # macOS/Linux
    export GITHUB_TOKEN=your_token_here
-   # Add to ~/.bashrc or ~/.zshrc for persistence
-   ```
-
-   **Windows:**
-   ```cmd
+   
+   # Windows
    setx GITHUB_TOKEN "your_token_here"
    ```
-
-3. **Verify it's working:**
-   ```bash
-   ./build/flame_sync
-   # Should show: "🔑 Using GitHub personal access token"
-   ```
-
-## 🛠️ Available MCP Tools
-
-Once connected to your MCP client, you'll have access to:
-
-### 1. `search_documentation`
-Search through all Flame documentation.
-
-**Example usage:**
-> "Search the Flame documentation for collision detection examples"
-
-### 2. `sync_documentation`
-Manually refresh the documentation cache from GitHub.
-
-**Example usage:**
-> "Sync the Flame documentation to get the latest updates"
-
-## 📊 MCP Resources
-
-The server provides 80+ documentation resources accessible via MCP, including:
-
-- `flame://index` - Main documentation index
-- `flame://flame/components/component_system` - Component system
-- `flame://flame/rendering/rendering` - Rendering and graphics
-- `flame://flame/inputs/inputs` - Input handling
-- `flame://flame/collision_detection/collision_detection` - Collision systems
-- `flame://flame/effects/effects` - Effects and animations
-- `flame://tutorials/platformer/platformer` - Platformer tutorial
-- `flame://bridge_packages/flame_audio/audio` - Audio integration
-- And many more...
-
-## 🔍 How It Works
-
-### Documentation Sync Process
-
-1. **GitHub API**: Fetches directory structure from `flame-engine/flame/doc`
-2. **Download**: Downloads all `.md` files preserving directory structure
-3. **Cache**: Stores files locally in `flame_docs_cache/`
-4. **Serve**: Makes documentation available via MCP protocol
-
-### MCP Integration
-
-- **Resources**: Each documentation file becomes an MCP resource with URI `flame://path/to/file`
-- **Tools**: Provides search and sync capabilities
-- **Protocol**: Communicates via JSON-RPC over stdin/stdout
 
 ## 📁 Project Structure
 
 ```
 flame_mcp_server/
 ├── bin/
-│   ├── flame_mcp_live.dart    # Main MCP server executable
-│   └── flame_sync.dart        # Manual sync utility
+│   ├── flame_mcp_live.dart           # Main MCP server
+│   └── flame_sync_standalone.dart    # Documentation sync utility
 ├── lib/src/
-│   ├── flame_live_docs.dart   # GitHub documentation fetcher
-│   └── flame_mcp_live.dart    # MCP server implementation
-├── build_clean.sh             # Build and setup script
-├── pubspec.yaml               # Dart dependencies
-├── .gitignore                 # Git ignore rules
-└── README.md                  # This file
-
-# Generated at runtime:
-├── flame_docs_cache/          # Downloaded documentation
-├── build/                     # Compiled executables
-│   ├── flame_mcp_live         # MCP server binary
-│   └── flame_sync             # Sync utility binary
-└── .dart_tool/               # Dart build artifacts
+│   ├── flame_live_docs.dart          # Documentation management
+│   └── flame_mcp_live.dart           # MCP protocol implementation
+├── build/
+│   └── flame_mcp_live                # Compiled MCP server
+├── flame_docs_cache/                 # Cached documentation (146 files)
+├── build_clean.sh                    # Build and setup script
+└── README.md                         # This file
 ```
+
+## 🎮 Example Interactions
+
+### Building a Space Shooter Game
+**You:** *"I want to build a space shooter game in Flame. Show me the complete tutorial."*
+
+**Response:** Complete 6-step tutorial including:
+- Project setup and basic game structure
+- Player controls and graphics
+- Animations and visual effects
+- Enemy spawning and movement
+- Shooting mechanics
+- Collision detection and scoring
+
+### Learning About Components
+**You:** *"How does the Flame component system work?"*
+
+**Response:** Detailed documentation about:
+- Component lifecycle
+- Component hierarchy
+- Built-in components
+- Creating custom components
+- Component communication
+
+## 🔄 Maintenance
+
+### Refresh Documentation Cache
+```bash
+# Update to latest Flame documentation
+dart run bin/flame_sync_standalone.dart
+```
+
+### Rebuild Server
+```bash
+# Clean rebuild with fresh documentation
+./build_clean.sh
+```
+
+## 📋 Prerequisites
+
+- **Dart SDK**: Version 3.2.0 or higher
+- **Internet Connection**: Required for initial documentation sync
+- **MCP Client**: Claude Desktop, Amazon Q CLI, or compatible client
 
 ## 🐛 Troubleshooting
 
-### Build Issues
+### Server Not Found
+- Ensure you're using the **absolute path** to the executable in your MCP config
+- Verify the executable exists: `ls -la build/flame_mcp_live`
+- Check file permissions: `chmod +x build/flame_mcp_live`
 
-**Problem**: `dart pub get` fails  
-**Solution**: Ensure Dart SDK 3.2.0+ is installed
+### No Search Results
+- Run `./build_clean.sh` to rebuild cache and server
+- Check cache exists: `ls flame_docs_cache/`
+- Verify cache has content: `find flame_docs_cache -name "*.md" | wc -l` (should show ~146)
 
-**Problem**: Permission denied on executables  
-**Solution**: 
-```bash
-chmod +x build/flame_mcp_live build/flame_sync
-```
+### Rate Limit Issues
+- Set up a GitHub personal access token (see Configuration section)
+- Check rate limit status in sync logs
 
-### Sync Issues
+## 📈 Performance
 
-**Problem**: GitHub rate limit exceeded  
-**Solution**: Set up a `GITHUB_TOKEN` environment variable
-
-**Problem**: Network timeout during sync  
-**Solution**: Run `./build/flame_sync` to retry manually
-
-### MCP Integration Issues
-
-**Problem**: MCP client doesn't see the server  
-**Solution**: 
-1. Use absolute path in configuration
-2. Restart MCP client after config changes
-3. Verify executable exists and runs
-
-**Problem**: Server starts but no documentation appears  
-**Solution**: 
-1. Run `./build/flame_sync` to sync documentation
-2. Check that `flame_docs_cache/` contains `.md` files
-
-## 📈 Performance Stats
-
-- **Documentation Files**: ~80 Markdown files
+- **Documentation Files**: 146 Markdown files
+- **Cache Size**: ~3 MB
 - **Sync Time**: 30-60 seconds (network dependent)
-- **Cache Size**: ~2-3 MB
 - **Memory Usage**: <50 MB when running
-- **Startup Time**: <1 second
-
-## 🔒 Security Notes
-
-- Never commit GitHub tokens to version control
-- Use environment variables for sensitive configuration
-- The server only reads public documentation from GitHub
-- No data is sent to external services except GitHub API
+- **Startup Time**: <2 seconds
 
 ## 🤝 Contributing
 
 1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+2. Create a feature branch
 3. Make your changes
 4. Test with `./build_clean.sh`
-5. Commit changes (`git commit -m 'Add amazing feature'`)
-6. Push to branch (`git push origin feature/amazing-feature`)
-7. Open a Pull Request
+5. Submit a pull request
 
 ## 📄 License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+This project is licensed under the MIT License.
 
 ## 🔗 Related Links
 
@@ -254,13 +227,6 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - [Amazon Q Developer](https://aws.amazon.com/q/developer/)
 - [Dart Language](https://dart.dev/)
 
-## 💡 Usage Tips
-
-1. **Set GitHub Token**: Avoid rate limiting with a personal access token
-2. **Regular Syncing**: Run `./build/flame_sync` after major Flame releases
-3. **Effective Searching**: Use specific terms when searching documentation
-4. **Resource URIs**: Access specific docs directly via `flame://path/to/file` URIs
-
 ---
 
-**Ready to get started?** Run `./build_clean.sh` and add the server to your MCP client!
+**Ready to start building games with Flame?** Run `./build_clean.sh` and add the server to your MCP client! 🎮
