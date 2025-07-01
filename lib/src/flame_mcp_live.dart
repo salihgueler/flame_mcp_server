@@ -526,8 +526,4 @@ class FlameMcpLive {
           '{"jsonrpc":"2.0","id":null,"error":{"code":-32603,"message":"Internal JSON encoding error"}}');
     }
   }
-
-  void dispose() {
-    _docs.dispose();
-  }
 }

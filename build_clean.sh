@@ -31,7 +31,7 @@ echo "📚 Fetching Flame documentation..."
 echo "   • This may take 30-60 seconds depending on network speed"
 
 # Use the standalone sync script to fetch documentation
-dart run bin/flame_sync_standalone.dart
+dart run bin/flame_doc_syncer.dart
 
 if [ $? -ne 0 ]; then
     echo "⚠️  Documentation sync failed, but build completed"
@@ -45,7 +45,7 @@ echo "✅ Build completed successfully!"
 echo ""
 echo "📋 Available:"
 echo "   • build/flame_mcp_live           - MCP server (search only)"
-echo "   • bin/flame_sync_standalone.dart - Manual documentation sync"
+echo "   • bin/flame_doc_syncer.dart - Manual documentation sync"
 echo ""
 echo "📁 Documentation cache:"
 echo "   • flame_docs_cache/              - Local Flame documentation"
@@ -55,5 +55,5 @@ echo "   # Start MCP server"
 echo "   ./build/flame_mcp_live"
 echo ""
 echo "   # Manual sync (refresh docs)"
-echo "   dart run bin/flame_sync_standalone.dart"
+echo "   dart run bin/flame_doc_syncer.dart"
 echo ""

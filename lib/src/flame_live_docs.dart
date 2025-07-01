@@ -1,35 +1,18 @@
-import 'dart:convert';
 import 'dart:io';
-import 'package:http/http.dart' as http;
 import 'package:path/path.dart' as path;
 
 /// Simple, robust live documentation fetcher for Flame engine
 class FlameLiveDocs {
-  static const String repoApiUrl =
-      'https://api.github.com/repos/flame-engine/flame/contents/doc';
-  static const String rawBaseUrl =
-      'https://raw.githubusercontent.com/flame-engine/flame/main/doc';
-  
   // Use absolute path for cache directory
   static String get cacheDir {
     // Get the directory where the executable is located
     final executablePath = Platform.resolvedExecutable;
     final executableDir = File(executablePath).parent.path;
-    
+
     // The executable is in build/, so go up one level to project root
     final projectRoot = Directory(executableDir).parent.path;
     return path.join(projectRoot, 'flame_docs_cache');
   }
-
-  final http.Client _client = http.Client();
-  final String? _githubToken;
-
-  /// Create a new FlameLiveDocs instance
-  ///
-  /// [githubToken] - Optional GitHub personal access token for higher rate limits
-  /// If not provided, will check GITHUB_TOKEN environment variable
-  FlameLiveDocs({String? githubToken})
-      : _githubToken = githubToken ?? Platform.environment['GITHUB_TOKEN'];
 
   /// Initialize the documentation system
   Future<void> initialize() async {
@@ -37,38 +20,6 @@ class FlameLiveDocs {
     final dir = Directory(cacheDir);
     if (await dir.exists()) {
       await _buildIndex();
-    }
-  }
-
-  /// Get HTTP headers for GitHub API requests
-  Map<String, String> _getHeaders() {
-    final headers = <String, String>{
-      'Accept': 'application/vnd.github.v3+json',
-      'User-Agent': 'Flame-MCP-Server/1.0',
-    };
-
-    if (_githubToken != null && _githubToken.isNotEmpty) {
-      headers['Authorization'] = 'Bearer $_githubToken';
-    }
-
-    return headers;
-  }
-
-  /// Check GitHub API rate limit status
-  Future<Map<String, dynamic>> getRateLimitStatus() async {
-    try {
-      final response = await _client.get(
-        Uri.parse('https://api.github.com/rate_limit'),
-        headers: _getHeaders(),
-      );
-
-      if (response.statusCode == 200) {
-        return jsonDecode(response.body);
-      } else {
-        throw Exception('Failed to get rate limit: ${response.statusCode}');
-      }
-    } catch (e) {
-      return {'error': e.toString()};
     }
   }
 
@@ -84,12 +35,13 @@ class FlameLiveDocs {
       await for (final entity in dir.list(recursive: true)) {
         if (entity is File && entity.path.endsWith('.md')) {
           final relativePath = path.relative(entity.path, from: cacheDir);
-          final uri = 'flame://${relativePath.replaceAll(path.separator, '/').replaceAll('.md', '')}';
+          final uri =
+              'flame://${relativePath.replaceAll(path.separator, '/').replaceAll('.md', '')}';
           resources.add(uri);
         }
       }
     }
-    
+
     _cachedResources = resources;
   }
 
@@ -99,7 +51,7 @@ class FlameLiveDocs {
     if (_cachedResources != null) {
       return _cachedResources!;
     }
-    
+
     // Build index if not cached
     await _buildIndex();
     return _cachedResources ?? [];
@@ -165,9 +117,10 @@ class FlameLiveDocs {
   Future<List<Map<String, dynamic>>> searchTutorials(String query) async {
     final results = <Map<String, dynamic>>[];
     final resources = await getResources();
-    
+
     // Filter to only tutorial resources
-    final tutorialResources = resources.where((uri) => uri.contains('tutorials/')).toList();
+    final tutorialResources =
+        resources.where((uri) => uri.contains('tutorials/')).toList();
 
     for (final uri in tutorialResources) {
       try {
@@ -201,9 +154,5 @@ class FlameLiveDocs {
       }
     }
     return lines.take(3).join('\n').trim();
-  }
-
-  void dispose() {
-    _client.close();
   }
 }
